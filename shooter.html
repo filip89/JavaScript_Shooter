@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Shooter</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<style>
+html {
+	cursor: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none; 
+	user-select: none; 
+}
+body {
+	padding: 0px;
+	margin: 0px;
+}
+#area {
+	position: relative;
+	background-color: lightblue;
+	width: 800px;
+	height: 450px;
+	margin: auto;
+	margin-top: 100px;
+	cursor: crosshair;
+}
+#menu {
+	width: 200px;
+	margin: auto;
+	position: relative;
+	top: 150px;
+	text-align: center;
+	background-color: #333333;
+	color: #d9d9d9;
+	border-radius: 5px;
+}
+.menuItem {
+	padding: 10px;
+	font-size: 20px;
+	color: #d9d9d9;
+}
+.menuItem:hover {
+	color: #d9d9d9;
+	background-color: #0d0d0d;
+	border-radius: 5px;
+	cursor: pointer;
+}
+#beginningTimer {
+	display:none;
+	margin:auto;
+	position: relative;
+	top: 120px;
+	width: 50px;
+	font-size: 40px;
+	font-weight: bold;
+	text-align: center;
+}
+.enemy {
+	position: absolute;
+	background-image: url("target.jpg");
+	background-size: 100% 100%;
+	background-positon: center;
+	border-radius: 50%;
+	box-shadow: 0px 0px 5px white;
+	z-index: 1;
+}
+.enemy.small {
+	width: 50px;
+	height: 50px;
+}
+.enemy.big {
+	width: 80px;
+	height: 80px;
+}
+#hud {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	height: 50px;
+	width: 100%;
+	box-sizing: border-box;
+	background-color: gray;
+	cursor: pointer;
+}
+#killCounter {
+	float: right;
+	margin: 10px;
+	background-color: black;
+	width: 40px;
+	font-size: 20px;
+	color: white;
+	text-align: center;
+}
+table#ending {
+	display: none;
+	position: relative;
+	top: 50px;
+	margin: auto;
+	background-color: black;
+	color: white;
+}
+table#ending td {
+	padding: 5px;
+	font-size: 18px;
+	vertical-align: center;
+}
+table#ending td#endPoints {
+	font-size: 20px;
+	font-weight: bold;
+}
+table#ending button {
+	width: 100%;
+	color: black;
+}
+.damage {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	border: 1px solid black;
+	border-radius: 50%;
+	background-color: white;
+	z-index: 10;
+}
+</style>
+</head>
+<body>
+	<div id="area">
+		<div id="menu">
+			<div class="menuItem" id="start">START</div>
+		</div>
+		<div id="beginningTimer"></div>
+		<table id="ending">
+			<tr><td>Big targets: </td><td><span id="endBigKills"></span><span> * 30</span></td></tr>
+			<tr><td>Small targets: </td><td><span id="endSmallKills"></span><span> * 50</span></td></tr>
+			<tr><td>Score: </td><td id="endPoints"></td></tr>
+			<tr><td colspan="2"><button onclick='endOK()'>OK</button></td></tr>
+		</table>
+		<div id="hud"><span id="killCounter">0</span></div>
+	</div>
+<script>
+var enemiesSpawned = 0, killCount = 0, bigKills = 0, smallKills = 0, genEnemInterval;
+
+$("#start").on("click", function(){
+	$("#menu").hide();
+	gameStart();
+	});
+function gameStart() {
+	$("#beginningTimer").show();
+	setTimeout(timerThree,100);
+	setTimeout(timerTwo,1100);
+	setTimeout(timerOne,2100);
+	setTimeout(timerGo,3100);
+	setTimeout(endTimer,3600);
+}
+function timerThree(){
+	$("#beginningTimer").text("3");
+}
+function timerTwo(){
+	$("#beginningTimer").text("2");
+}
+function timerOne(){
+	$("#beginningTimer").text("1");
+}
+function timerGo(){
+	$("#beginningTimer").text("GO!");
+}
+function endTimer(){
+	$("#beginningTimer").fadeOut("fast", function(){
+		genEnemInterval = setInterval(generateEnemies, 2000);
+	});
+}
+
+function generateEnemies() {
+	var speed1 = Math.floor(Math.random() * 1000);
+	var speed2 = Math.floor(Math.random() * 2000);
+	setTimeout(generateEnemy, speed1);
+	setTimeout(generateEnemy, speed2);
+
+}
+
+function generateEnemy(){
+	var eWidth, eHeight;
+	var size = Math.floor(Math.random() * 2);
+	switch(size){
+		case 0:
+			sizeClass = "small";
+	}
+	switch(size){
+		case 1:
+			sizeClass = "big";
+	}
+	var posTop = Math.floor(Math.random() * 300) + "px";
+	var posLeft = Math.floor(Math.random() * 720) + "px";
+	var enemy = $("<div class='enemy " + sizeClass + "' style='left:" + posLeft + ";top:" + posTop + ";'></div>").appendTo("#area");
+	enemiesSpawned++;
+	if (enemiesSpawned < 15){
+	setTimeout(function(){$(enemy).remove();},1500);
+	}
+	else if (enemiesSpawned < 40) {
+	setTimeout(function(){$(enemy).remove();},1100);
+	}
+	else {
+	setTimeout(function(){$(enemy).remove();},700);
+	}
+	
+	if(enemiesSpawned == 50){
+		clearInterval(genEnemInterval);
+		setTimeout(ending, 3000);
+	}
+}
+$(document).on("click", ".enemy", function(){
+	var enemy = $(this);
+	var mouseLeft = event.clientX;
+	var mouseTop = event.clientY;
+
+	holeLeft = mouseLeft - $(enemy).offset().left - 4;
+	holeTop = mouseTop - $(enemy).offset().top - 4;
+
+	$(enemy).append("<div class='damage' style='left:" + holeLeft + "px;top:" + holeTop + "px;'></div>");
+	if($(enemy).hasClass("big")){
+		bigKills++;
+	}
+	else {
+		smallKills++;
+	}
+
+		$(enemy).fadeOut("slow", function(){
+			$(this).remove();
+			killCount++;
+			$("#killCounter").text(killCount);
+		});
+
+});
+
+function ending() {
+	$("#ending").fadeIn();
+	$("#endBigKills").text(bigKills);
+	$("#endSmallKills").text(smallKills);
+	$("#endPoints").text(bigKills * 30 + smallKills * 50);
+}
+
+function endOK() {
+	$("#ending").fadeOut(function(){
+		$("#menu").fadeIn();
+		enemiesSpawned = 0, killCount = 0, bigKills = 0, smallKills = 0;
+		$("#beginningTimer").text("");
+	});
+}
+</script>
+</body>
+</html>
+  
